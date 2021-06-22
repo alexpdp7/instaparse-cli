@@ -1,0 +1,54 @@
+on: [push]
+
+name: Continuous integration
+
+jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: lein cljfmt check
+
+  native-build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            gu-binary: gu
+            lein-binary: lein
+            native-alias: native
+            package: linux
+            target-binary: instaparse-cli
+          - os: macos-latest
+            gu-binary: gu
+            lein-binary: lein
+            native-alias: native
+            package: macos
+            target-binary: instaparse-cli
+          - os: windows-latest
+            gu-binary: gu.cmd
+            lein-binary: lein.bat
+            native-alias: native-win
+            package: windows
+            target-binary: instaparse-cli.exe
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ilammy/msvc-dev-cmd@v1
+      - uses: DeLaGuardo/setup-graalvm@master
+        with:
+          graalvm: '21.1.0'
+          java: 'java11'
+          arch: 'amd64'
+      - run: |
+          ${{ matrix.gu-binary }} install native-image
+      - run: brew install leiningen
+        if: ${{ matrix.os == 'macos-latest' }}
+      - run: choco install lein
+        if: ${{ matrix.os == 'windows-latest' }}
+      - run: ${{ matrix.lein-binary }} do uberjar, ${{ matrix.native-alias }}
+      - uses: actions/upload-artifact@v1
+        with:
+          name: ${{ matrix.package }}
+          path: target/${{ matrix.target-binary }}
