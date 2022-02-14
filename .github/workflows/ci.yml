@@ -38,8 +38,8 @@ jobs:
       - uses: ilammy/msvc-dev-cmd@v1
       - uses: DeLaGuardo/setup-graalvm@master
         with:
-          graalvm: '21.1.0'
-          java: 'java11'
+          graalvm: '22.0.0.2'
+          java: 'java17'
           arch: 'amd64'
       - run: |
           ${{ matrix.gu-binary }} install native-image

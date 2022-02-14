@@ -1,7 +1,7 @@
 (defproject instaparse-cli "master"
   :dependencies [[org.clojure/clojure "1.10.3"],
                  [instaparse "1.4.10"],
-                 [org.clojure/data.json "2.3.1"]]
+                 [org.clojure/data.json "2.4.0"]]
   :plugins [[lein-cljfmt "0.8.0"]]
   :main instaparse-cli.core
   :profiles {:uberjar {:aot :all}
